@@ -1,4 +1,6 @@
 ﻿using LightningTax.WebAPI.Data;
+using LightningTax.WebAPI.Dtos;
+using LightningTax.WebAPI.Helpers;
 using LightningTax.WebAPI.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,82 +11,168 @@ namespace LightningTax.WebAPI.Controllers
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private readonly DataContext context;
+        private readonly DataContext _context;
 
         public CompanyController(DataContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
-        [HttpGet("companies")]
-        public async Task<ActionResult<List<Company>>> GetCompanies()
+        [HttpGet("GetCompanies")]
+        public async Task<ActionResult<GetCompaniesResponseDto>> GetCompanies()
         {
-            return Ok(await context.Companies.ToListAsync());
+            try
+            {
+                var response = new GetCompaniesResponseDto();
+
+                var companies = await _context.Companies.ToListAsync();
+                //throw new Exception("test exception");
+
+                response.Companies = companies;
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // TODO: log ex
+
+                //var response = new GetCompaniesResponseDto
+                //{
+                //    StatusCode = ServerStatusEnum.SystemError
+                //    //Errors = new List<string> { ex.Message }
+                //};
+
+                //return StatusCode(StatusCodes.Status500InternalServerError, response);
+                return ResponseHelper.SystemError();
+            }
+
         }
 
         [HttpGet("{companyId}")]
-        public async Task<ActionResult<List<Company>>> GetCompany(long companyId)
+        public async Task<ActionResult<GetCompanyByIdResponseDto>> GetCompany(long companyId)
         {
-            var company = await context.Companies.FindAsync(companyId);
-            if (company == null)
-                return NotFound("Company not found");
+            try
+            {
+                var response = new GetCompanyByIdResponseDto();
 
-            return Ok(company);
+                var company = await _context.Companies.FindAsync(companyId);
+
+                if (company == null)
+                {
+                    //response.StatusCode = ServerStatusEnum.NotFound;
+                    ////return NotFound("Company not found");
+                    //return StatusCode(StatusCodes.Status404NotFound, response);
+                    return ResponseHelper.NotFound();
+                }
+
+                response.Company = company;
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // TODO: log ex
+                return ResponseHelper.SystemError();
+            }
         }
 
-        [HttpPost("add")]
-        public async Task<ActionResult<List<Company>>> AddCompany([FromBody] Company company)
+        [HttpPost("AddCompany")]
+        public async Task<ActionResult<AddCompanyResponseDto>> AddCompany([FromBody] Company company)
         {
-            context.Companies.Add(company);
-            await context.SaveChangesAsync();
+            try
+            {
+                var response = new AddCompanyResponseDto();
 
-            return Ok(await context.Companies.FindAsync(company.Id));
+                _context.Companies.Add(company);
+                await _context.SaveChangesAsync();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // TODO: log ex
+                return ResponseHelper.SystemError();
+            }
         }
 
-        [HttpPut("edit")]
-        public async Task<ActionResult<List<Company>>> UpdateCompany([FromBody] Company requestedCompany)
+        [HttpPut("UpdateCompany")]
+        public async Task<ActionResult<UpdateCompanyResponseDto>> UpdateCompany([FromBody] Company requestedCompany)
         {
-            var company = await context.Companies.FindAsync(requestedCompany.Id);
-            if (company == null)
-                return NotFound("Company not found");
+            try
+            {
+                var response = new UpdateCompanyResponseDto();
 
-            //company = requestedCompany;
-            company.CompanyNumber = requestedCompany.CompanyNumber;
-            company.Name = requestedCompany.Name;
-            company.ResidentStatus = requestedCompany.ResidentStatus;
-            company.BusinessType = requestedCompany.BusinessType;
-            company.PaidUpCapital = requestedCompany.PaidUpCapital;
-            company.SmeEligible = requestedCompany.SmeEligible;
-            company.FinancialYearEnd = requestedCompany.FinancialYearEnd;
-            company.CommencementDate = requestedCompany.CommencementDate;
-            company.CessationDate = requestedCompany.CessationDate;
-            //company.CreatedAt = requestedCompany.CreatedAt;
+                var company = await _context.Companies.FindAsync(requestedCompany.Id);
+                if (company == null)
+                    return ResponseHelper.NotFound();
 
-            await context.SaveChangesAsync();
+                //company = requestedCompany;
+                company.CompanyNumber = requestedCompany.CompanyNumber;
+                company.Name = requestedCompany.Name;
+                company.ResidentStatus = requestedCompany.ResidentStatus;
+                company.BusinessType = requestedCompany.BusinessType;
+                company.PaidUpCapital = requestedCompany.PaidUpCapital;
+                company.SmeEligible = requestedCompany.SmeEligible;
+                company.FinancialYearEnd = requestedCompany.FinancialYearEnd;
+                company.CommencementDate = requestedCompany.CommencementDate;
+                company.CessationDate = requestedCompany.CessationDate;
+                //company.CreatedAt = requestedCompany.CreatedAt;
 
-            return Ok(await context.Companies.ToListAsync());
+                await _context.SaveChangesAsync();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // TODO: log ex
+                return ResponseHelper.SystemError();
+            }
         }
 
         [HttpDelete("{companyId}")]
-        public async Task<ActionResult<List<Company>>> DeleteCompany(long companyId)
+        public async Task<ActionResult<DeleteCompanyByIdResponseDto>> DeleteCompany(long companyId)
         {
-            var dbcompany = await context.Companies.FindAsync(companyId);
-            if (dbcompany == null)
-                return NotFound("Company not found");
+            try
+            {
+                var response = new DeleteCompanyByIdResponseDto();
 
-            context.Companies.Remove(dbcompany);
-            await context.SaveChangesAsync();
+                var companyToDelete = await _context.Companies.FindAsync(companyId);
+                if (companyToDelete == null)
+                    return ResponseHelper.NotFound();
 
-            return Ok(await context.Companies.ToListAsync());
+                _context.Companies.Remove(companyToDelete);
+                await _context.SaveChangesAsync();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // TODO: log ex
+                return ResponseHelper.SystemError();
+            }
         }
 
-        [HttpGet("companyNames")]
-        public async Task<ActionResult<object>> GetCompanyNames()
+        [HttpGet("GetCompanyNames")]
+        public async Task<ActionResult<GetCompanyNamesResponseDto>> GetCompanyNames()
         {
-            var x = await context.Companies.ToListAsync();
-            var y = x.Select(x => x.Name);
+            try
+            {
+                var response = new GetCompanyNamesResponseDto();
 
-            return Ok(y);
+                var companies = await _context.Companies.ToListAsync();
+                var companyNames = companies.Select(x => x.Name).ToList();
+
+                response.CompanyNames = companyNames;
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // TODO: log ex
+                return ResponseHelper.SystemError();
+            }
         }
+
+
     }
 }

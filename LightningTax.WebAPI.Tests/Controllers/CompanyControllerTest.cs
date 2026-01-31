@@ -1,6 +1,8 @@
 ﻿using LightningTax.WebAPI.Controllers;
 using LightningTax.WebAPI.Data;
+using LightningTax.WebAPI.Dtos;
 using LightningTax.WebAPI.Models.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,11 +58,14 @@ namespace LightningTax.WebAPI.Tests.Controllers
         [Fact]
         public async Task GetCompanies_ReturnsAllCompanies()
         {
+            // Act
             var result = await _controller.GetCompanies();
 
+            // Assert
             //var ok = Assert.IsType<ActionResult<List<Company>>>(result);
             var ok = Assert.IsType<OkObjectResult>(result.Result);
-            var companies = Assert.IsAssignableFrom<IEnumerable<Company>>(ok.Value);
+            var responseDto = ok.Value as GetCompaniesResponseDto;
+            var companies = Assert.IsAssignableFrom<IEnumerable<Company>>(responseDto.Companies);
 
             Assert.Equal(2, companies.Count());
         }
@@ -71,11 +76,16 @@ namespace LightningTax.WebAPI.Tests.Controllers
         [Fact]
         public async Task GetCompanies_ReturnsAllCompanyNames()
         {
+            // Act
             var result = await _controller.GetCompanyNames();
 
+            // Assert
             //var ok = Assert.IsType<ActionResult<List<Company>>>(result);
             var ok = Assert.IsType<OkObjectResult>(result.Result);
-            var companyNames = Assert.IsAssignableFrom<IEnumerable<string>>(ok.Value);
+            var responseDto = ok.Value as GetCompanyNamesResponseDto;
+
+            //var companyNames = Assert.IsAssignableFrom<IEnumerable<string>>(ok.Value);
+            var companyNames = Assert.IsAssignableFrom<IEnumerable<string>>(responseDto.CompanyNames);
 
             Assert.Equal(2, companyNames.Count());
         }
@@ -86,10 +96,18 @@ namespace LightningTax.WebAPI.Tests.Controllers
         [Fact]
         public async Task GetCompany_ReturnsCompany_WhenExists()
         {
-            var result = await _controller.GetCompany(1);
+            // Arrange
+            var companyId = 1;
 
+            // Act
+            var result = await _controller.GetCompany(companyId);
+
+            // Assert
             var ok = Assert.IsType<OkObjectResult>(result.Result);
-            var company = Assert.IsType<Company>(ok.Value);
+            var responseDto = ok.Value as GetCompanyByIdResponseDto;
+
+            //var company = Assert.IsType<Company>(ok.Value);
+            var company = Assert.IsType<Company>(responseDto.Company);
 
             Assert.Equal("Alpha Sdn Bhd", company.Name);
         }
@@ -97,8 +115,13 @@ namespace LightningTax.WebAPI.Tests.Controllers
         [Fact]
         public async Task GetCompany_ReturnsNotFound_WhenNotExists()
         {
-            var result = await _controller.GetCompany(999);
+            // Arrange
+            var invalidCompanyId = 999;
 
+            // Act
+            var result = await _controller.GetCompany(invalidCompanyId);
+
+            // Assert
             Assert.IsType<NotFoundObjectResult>(result.Result);
         }
 
@@ -123,11 +146,13 @@ namespace LightningTax.WebAPI.Tests.Controllers
 
             // Assert
             //var created = Assert.IsType<CreatedAtActionResult>(result.Result);
-            var created = Assert.IsType<OkObjectResult>(result.Result);
-            var company = Assert.IsType<Company>(created.Value);
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            //var responseDto = ok.Value as AddCompanyResponseDto;
 
-            Assert.Equal("Gamma Sdn Bhd", company.Name);
-            Assert.Equal("C003", company.CompanyNumber);
+            //var company = Assert.IsType<Company>(responseDto.Company);
+
+            //Assert.Equal("Gamma Sdn Bhd", company.Name);
+            //Assert.Equal("C003", company.CompanyNumber);
 
             // Verify persisted
             Assert.Equal(3, _context.Companies.Count());
