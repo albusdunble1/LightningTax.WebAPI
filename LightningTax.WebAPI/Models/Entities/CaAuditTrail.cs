@@ -16,8 +16,11 @@ namespace LightningTax.WebAPI.Models.Entities
 
         public string? RuleApplied { get; set; }
 
+        //[Column(TypeName = "jsonb")]
+        //public JsonDocument? Inputs { get; set; }
+
         [Column(TypeName = "jsonb")]
-        public JsonDocument? Inputs { get; set; }
+        public string Inputs { get; set; } = "{}";
 
         public string? Formula { get; set; }
 

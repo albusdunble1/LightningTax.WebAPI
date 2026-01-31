@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LightningTax.WebAPI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LightningTax.WebAPI.Models.Entities
@@ -12,7 +13,7 @@ namespace LightningTax.WebAPI.Models.Entities
         public long CompanyId { get; set; }
         public long CompanyYearId { get; set; }
 
-        public string PoolType { get; set; } = null!;
+        public PoolTypeEnum? PoolType { get; set; }
 
         [Column(TypeName = "numeric(15,2)")]
         public decimal? OpeningBalance { get; set; }

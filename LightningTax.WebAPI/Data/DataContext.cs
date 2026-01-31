@@ -1,4 +1,5 @@
 ﻿using LightningTax.WebAPI.Models.Entities;
+using LightningTax.WebAPI.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Xml;
 
@@ -35,17 +36,13 @@ namespace LightningTax.WebAPI.Data
             {
                 entity.HasKey(e => e.Id);
 
-                entity.HasIndex(e => e.CompanyNumber)
-                      .IsUnique();
+                entity.HasIndex(e => e.CompanyNumber).IsUnique();
 
-                entity.Property(e => e.PaidUpCapital)
-                      .HasPrecision(15, 2);
+                entity.Property(e => e.PaidUpCapital).HasPrecision(15, 2);
 
-                entity.Property(e => e.CreatedAt)
-                      .HasDefaultValueSql("now()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("now()");
 
-                entity.Property(e => e.ResidentStatus)
-                      .HasConversion<string>();
+                entity.Property(e => e.ResidentStatus).HasConversion<string>();
             });
 
             // -----------------------
@@ -55,19 +52,19 @@ namespace LightningTax.WebAPI.Data
             {
                 entity.HasKey(e => e.Id);
 
-                entity.HasIndex(e => new { e.CompanyId, e.YearOfAssessment })
-                      .IsUnique();
+                entity.HasIndex(e => new { e.CompanyId, e.YearOfAssessment }).IsUnique();
 
                 entity.HasOne(e => e.Company)
                       .WithMany()
                       .HasForeignKey(e => e.CompanyId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(e => e.Status)
-                      .HasDefaultValue("draft");
+                entity.Property(e => e.Status).HasDefaultValue(CompanyYearStatusEnum.draft);
 
-                entity.Property(e => e.CreatedAt)
-                      .HasDefaultValueSql("now()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("now()");
+
+                entity.Property(e => e.Status).HasConversion<string>();
+
             });
 
             // -----------------------
@@ -76,7 +73,6 @@ namespace LightningTax.WebAPI.Data
             modelBuilder.Entity<Asset>(entity =>
             {
                 entity.HasKey(e => e.Id);
-
                 entity.HasIndex(e => e.CompanyId);
 
                 entity.HasOne(e => e.Company)
@@ -84,17 +80,15 @@ namespace LightningTax.WebAPI.Data
                       .HasForeignKey(e => e.CompanyId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(e => e.OriginalCost)
-                      .HasPrecision(15, 2);
+                entity.Property(e => e.OriginalCost).HasPrecision(15, 2);
+                entity.Property(e => e.QualifyingExpenditure).HasPrecision(15, 2);
+                entity.Property(e => e.BusinessUsePct).HasPrecision(5, 2);
 
-                entity.Property(e => e.QualifyingExpenditure)
-                      .HasPrecision(15, 2);
+                entity.Property(e => e.Status).HasDefaultValue(AssetStatusEnum.active);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("now()");
 
-                entity.Property(e => e.BusinessUsePct)
-                      .HasPrecision(5, 2);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasDefaultValueSql("now()");
+                entity.Property(e => e.PoolType).HasConversion<string>();
+                entity.Property(e => e.Status).HasConversion<string>();
             });
 
             // -----------------------
@@ -106,9 +100,7 @@ namespace LightningTax.WebAPI.Data
 
                 entity.HasIndex(e => e.CompanyYearId);
                 entity.HasIndex(e => e.AssetId);
-
-                entity.HasIndex(e => new { e.CompanyYearId, e.AssetId })
-                      .IsUnique();
+                entity.HasIndex(e => new { e.CompanyYearId, e.AssetId }).IsUnique();
 
                 entity.Property(e => e.OpeningTwdv).HasPrecision(15, 2);
                 entity.Property(e => e.UnabsorbedCaBf).HasPrecision(15, 2);
@@ -119,8 +111,11 @@ namespace LightningTax.WebAPI.Data
                 entity.Property(e => e.ClosingTwdv).HasPrecision(15, 2);
                 entity.Property(e => e.UnabsorbedCaCf).HasPrecision(15, 2);
 
-                entity.Property(e => e.ComputedAt)
-                      .HasDefaultValueSql("now()");
+                entity.Property(e => e.ComputedBy).HasDefaultValue(ComputedByEnum.system);
+                entity.Property(e => e.ComputedAt).HasDefaultValueSql("now()");
+
+                entity.Property(e => e.BalancingType).HasConversion<string>();
+                entity.Property(e => e.ComputedBy).HasConversion<string>();
             });
 
             // -----------------------
@@ -136,6 +131,8 @@ namespace LightningTax.WebAPI.Data
                 entity.Property(e => e.AaRate).HasPrecision(5, 2);
                 entity.Property(e => e.AaAmount).HasPrecision(15, 2);
                 entity.Property(e => e.ClosingBalance).HasPrecision(15, 2);
+
+                entity.Property(e => e.PoolType).HasConversion<string>();
             });
 
             // -----------------------
@@ -145,11 +142,9 @@ namespace LightningTax.WebAPI.Data
             {
                 entity.HasKey(e => e.Id);
 
-                entity.HasIndex(e => e.CompanyYearId)
-                      .IsUnique();
+                entity.HasIndex(e => e.CompanyYearId).IsUnique();
 
-                entity.Property(e => e.GeneratedAt)
-                      .HasDefaultValueSql("now()");
+                entity.Property(e => e.GeneratedAt).HasDefaultValueSql("now()");
             });
 
             // -----------------------
@@ -159,8 +154,9 @@ namespace LightningTax.WebAPI.Data
             {
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.CreatedAt)
-                      .HasDefaultValueSql("now()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("now()");
+
+                //entity.Property(e => e.Inputs).HasColumnType("jsonb"); // specify in the model
             });
         }
     }

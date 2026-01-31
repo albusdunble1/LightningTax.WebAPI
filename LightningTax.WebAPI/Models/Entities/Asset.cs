@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LightningTax.WebAPI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LightningTax.WebAPI.Models.Entities
@@ -39,9 +40,9 @@ namespace LightningTax.WebAPI.Models.Entities
         [Column(TypeName = "numeric(5,2)")]
         public decimal? AaRate { get; set; }
 
-        public string? PoolType { get; set; } // single_rate | multi_rate
+        public PoolTypeEnum? PoolType { get; set; } // single_rate | multi_rate
 
-        public string Status { get; set; } = "active";
+        public AssetStatusEnum Status { get; set; } = AssetStatusEnum.active;
 
         public DateTime CreatedAt { get; set; }
     }

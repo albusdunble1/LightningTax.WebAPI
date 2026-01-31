@@ -27,7 +27,8 @@ namespace LightningTax.WebAPI.Controllers
         {
             var company = await context.Companies.FindAsync(companyId);
             if (company == null)
-                return BadRequest("Company not found");
+                return NotFound("Company not found");
+
             return Ok(company);
         }
 
@@ -37,7 +38,7 @@ namespace LightningTax.WebAPI.Controllers
             context.Companies.Add(company);
             await context.SaveChangesAsync();
 
-            return Ok(await context.Companies.ToListAsync());
+            return Ok(await context.Companies.FindAsync(company.Id));
         }
 
         [HttpPut("edit")]
@@ -45,7 +46,7 @@ namespace LightningTax.WebAPI.Controllers
         {
             var company = await context.Companies.FindAsync(requestedCompany.Id);
             if (company == null)
-                return BadRequest("Company not found");
+                return NotFound("Company not found");
 
             //company = requestedCompany;
             company.CompanyNumber = requestedCompany.CompanyNumber;
@@ -69,7 +70,7 @@ namespace LightningTax.WebAPI.Controllers
         {
             var dbcompany = await context.Companies.FindAsync(companyId);
             if (dbcompany == null)
-                return BadRequest("Company not found");
+                return NotFound("Company not found");
 
             context.Companies.Remove(dbcompany);
             await context.SaveChangesAsync();

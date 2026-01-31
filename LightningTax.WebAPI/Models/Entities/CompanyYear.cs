@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LightningTax.WebAPI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LightningTax.WebAPI.Models.Entities
@@ -19,7 +20,7 @@ namespace LightningTax.WebAPI.Models.Entities
         public DateOnly BasisPeriodStart { get; set; }
         public DateOnly BasisPeriodEnd { get; set; }
 
-        public string Status { get; set; } = "draft";
+        public CompanyYearStatusEnum Status { get; set; } = CompanyYearStatusEnum.draft;
 
         [Required]
         public string RuleVersion { get; set; } = null!;

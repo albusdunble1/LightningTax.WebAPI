@@ -2,7 +2,7 @@
 {
     public enum ResidentStatusEnum
     {
-        non_resident = 0,
-        resident = 1
+        resident = 1,
+        non_resident = 2
     }
 }

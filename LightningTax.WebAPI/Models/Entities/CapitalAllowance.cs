@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LightningTax.WebAPI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LightningTax.WebAPI.Models.Entities
@@ -37,7 +38,7 @@ namespace LightningTax.WebAPI.Models.Entities
         [Column(TypeName = "numeric(15,2)")]
         public decimal? BalancingAdjustment { get; set; }
 
-        public string? BalancingType { get; set; }
+        public BalancingTypeEnum? BalancingType { get; set; }
 
         [Column(TypeName = "numeric(15,2)")]
         public decimal ClosingTwdv { get; set; }
@@ -46,6 +47,6 @@ namespace LightningTax.WebAPI.Models.Entities
         public decimal UnabsorbedCaCf { get; set; }
 
         public DateTime ComputedAt { get; set; }
-        public string ComputedBy { get; set; } = "system";
+        public ComputedByEnum ComputedBy { get; set; } = ComputedByEnum.system;
     }
 }

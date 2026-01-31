@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="LightningTax.WebAPI.csproj" />
+  <Project Path="./LightningTax.WebAPI.Tests/LightningTax.WebAPI.Tests.csproj" Id="fcc27394-e0d5-42d8-91ad-0afb3d1ba54e" />
+  <Project Path="./LightningTax.WebAPI/LightningTax.WebAPI.csproj" />
 </Solution>
